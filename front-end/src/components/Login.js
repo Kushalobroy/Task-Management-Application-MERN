@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { ToastContainer,toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 const Login = ({ setLoggedIn }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/login', { username, password });
-      localStorage.setItem('token', res.data.token);
+      const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+      localStorage.setItem('token', response.data.token);
       setLoggedIn(true);
+      navigate('/dashboard');
+      toast.success(response.data.message);
     } catch (error) {
       console.error(error);
+    
+      toast.error(error.response.data.error);
     }
   };
 
   return (
     <div className='container'>
- 
-      <form onSubmit={handleSubmit}>
+        <ToastContainer position="top-center" autoClose={3000} />
       <div className='login__container'>
             <h2>Login </h2>
             <form className='login__form' onSubmit={handleSubmit}>
@@ -54,8 +59,7 @@ const Login = ({ setLoggedIn }) => {
                 </p>
             </form>
         </div>
-       
-      </form>
+   
     </div>
   );
 };
